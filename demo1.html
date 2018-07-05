@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>自定义highcharts</title>
+		<link rel="stylesheet" type="text/css" href="css/default.css">
+	</head>
+	
+	<body>
+		<a href="../../index.html">返回项目列表页</a>
+		<h1 style="text-align:center">自定义highchart图</h1>
+		<div class="row-flex container">
+		<div class="pre column-flex-center"><</div>
+		<div class="row-flex main-container" name="example1">
+			<div class="left-container">
+				<ul class="nav-scroll">
+					
+				</ul>
+			</div>
+			<div class="right-container column-flex">
+				<div class="top-container">
+					<div class="config-container">
+						<ul>
+							<li class="row-flex">
+								<span class="title">图表类型</span>
+								<div class="row-flex chart-icon-container"> 
+									<div class="column-flex-center chart-icon-item"><span class="chart-icon column-flex line" title="折线图" data-type="line"></span></div>
+									<div class="column-flex-center chart-icon-item"><span class="chart-icon column-flex column" title="柱状图" data-type="column"></span></div>
+									<div class="column-flex-center chart-icon-item"><span class="chart-icon column-flex pie" title="饼状图" data-type="pie"></span></div>
+								</div>
+							</li>
+							<li class="row-flex">
+								<span  class="title">X-Axis</span>
+								<div class="axis-container row-flex" data-type="xaxis"></div>
+							</li>
+							<li class="row-flex">
+								<span class="title">Y-Axis</span>
+								<div class="axis-container row-flex" data-type="yaxis" id="yaxis-container"></div>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<div class="bottom-container">
+					<div id="msg-container" class="column-flex-center"></div>
+					<div id="chart-container"></div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="next column-flex-center disable">></div>
+		</div>
+	</body>
+	
+	<script src="https://cdn.hcharts.cn/highcharts/highcharts.js"></script>
+	<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+	
+	<script>
+		
+		var globalData = {"titles":["省","市","男生","女生","成年","老人","未成年","工人","学生","白领","蓝领","流浪的人","游戏主播","明星主播","无法分类的人","教师","医护人员","吃皇粮的","吃狗粮的"],"results":[],"type":["x","x","y","y","y","y","y","y","y","y","y","y","y","y","y","y","y","y","y"]};
+		
+		var regionData = [{"code":110000,"province":"北京市","city":"东城区"},{"code":120000,"province":"天津市","city":"天津市"},{"code":130000,"province":"河北省","city":"石家庄市"},{"code":140000,"province":"山西省","city":"太原市"},{"code":150000,"province":"内蒙古自治区","city":"呼和浩特市"},{"code":210000,"province":"辽宁省","city":"沈阳市"},{"code":220000,"province":"吉林省","city":"长春市"},{"code":230000,"province":"黑龙江省","city":"哈尔滨市"},{"code":310000,"province":"上海市","city":"黄浦区"},{"code":320000,"province":"江苏省","city":"南京市"},{"code":330000,"province":"浙江省","city":"杭州市"},{"code":340000,"province":"安徽省","city":"合肥市"},{"code":350000,"province":"福建省","city":"福州市"},{"code":360000,"province":"江西省","city":"南昌市"},{"code":370000,"province":"山东省","city":"济南市"},{"code":410000,"province":"河南省","city":"郑州市"},{"code":420000,"province":"湖北省","city":"武汉市"},{"code":430000,"province":"湖南省","city":"长沙市"},{"code":440000,"province":"广东省","city":"广州市"},{"code":450000,"province":"广西壮族自治区","city":"南宁市"},{"code":460000,"province":"海南省","city":"海口市"},{"code":500000,"province":"重庆市","city":"重庆市"},{"code":510000,"province":"四川省","city":"成都市"},{"code":520000,"province":"贵州省","city":"贵阳市"},{"code":530000,"province":"云南省","city":"昆明市"},{"code":540000,"province":"西藏自治区","city":"拉萨市"},{"code":610000,"province":"陕西省","city":"西安市"},{"code":620000,"province":"甘肃省","city":"兰州市"},{"code":630000,"province":"青海省","city":"西宁市"},{"code":640000,"province":"宁夏回族自治区","city":"银川市"},{"code":650000,"province":"新疆维吾尔自治区","city":"乌鲁木齐市"},{"code":810000,"province":"香港特别行政区","city":"香港特别行政区"},{"code":820000,"province":"澳门特别行政区","city":"澳门特别行政区"},{"code":910000,"province":"台湾省","city":"台湾省"}];
+		
+		initGlobalData();
+
+		var globalConfig = {
+			charttype:null,
+			xAxis:null,
+			yAxis:null,
+			seriesCount:1
+		};
+	
+		var yAxis_limit = 3;
+		var cols = globalData.titles;
+		var results = globalData.results;		
+
+		function initGlobalData(){
+			globalData.results = regionData.map(function(ele, index, array){
+				var data = [].concat(ele.province,ele.city);
+				for(var i=0;i<17;i++) {
+					data.push(getRandomInteger(100));
+				}
+				return data;
+			});
+		}
+		
+		function getRandomInteger(top){
+			return parseInt(Math.random()*top);
+		}
+		
+		//index 从1开始 第几个的意思 不是索引
+		function getAllMetrics() {
+			return cols.map(function(element,index,array){
+				return {index:index+1, metrics:element};
+			});
+		}
+		
+		//同上方index 与索引对比的话需要-1
+		function getDatasByIndex(selectedIndex) {
+			var datas = [];
+			if(selectedIndex!== "undefined" && selectedIndex !== null) {
+				datas = results.map(function(element,index,array){
+					return element.filter(function(element1,index1,array1){
+						return index1 == selectedIndex - 1;
+					})[0];
+				});
+			}
+			return datas;
+		}
+		
+		function freshMsg(msg){
+			$("#msg-container").html("<span class='red'>" + msg + "</span>").show();
+			$("#chart-container").hide();
+		}
+		
+		function refreshChart(){
+			if(!globalConfig.charttype) {
+				freshMsg("请选择图表类型");
+			} else if(!globalConfig.xAxis) {
+				freshMsg("请选择横轴");
+			} else if(!globalConfig.yAxis || globalConfig.yAxis.length === 0) {
+				freshMsg("请选择纵轴数据列");
+			}else {
+				chart.showLoading();
+				
+				$("#msg-container").html("").hide();
+				$("#chart-container").show();	
+				
+				var categories = getDatasByIndex(globalConfig.xAxis),
+					series = [];
+			
+				for(var i=0;i<globalConfig.yAxis.length;i++) {
+					series[i] = {
+						data:getDatasByIndex(globalConfig.yAxis[i].index),
+						name: globalConfig.yAxis[i].title
+					};
+				}	
+
+				var isPie = globalConfig.charttype === "pie";
+				
+				series = series.map(function(obj,i){
+					var mapData = obj.data.map(function(data,index) {
+						var num = isNaN(data) ? null : parseFloat(data);
+						return isPie ? [categories[index], num] : num;
+					});
+
+					return {
+						data:mapData,
+						name:obj.name
+					};
+				});
+				
+				var tooltip = {};
+				
+				if(globalConfig.charttype === "line" || globalConfig.charttype === "column") {
+					tooltip = {
+						formatter: function() {
+							var s = [];
+							s.push("<font style='font-weight:bold;'>"+this.points[0].key+"</font>");
+							$.each(this.points, function(i, point) {
+								s.push("<span style='color:"+point.point.color+";font-size:12px;'>"+ point.series.name+' : '+
+								   "<font color='#000' style='font-weight:bold;'>" + point.y+ "</font>" + '</span>');
+							});
+							return s.join(' <br> ');
+						},
+						shared: true,
+						useHTML: true	
+					};
+				} else {
+					tooltip = {
+						formatter: function() {
+							var s = [];
+							s.push("<font style='font-weight:bold;'>"+this.key+"</font>");
+							s.push("<span style='color:"+this.color+";font-size:12px;'>"+ this.series.name+' : '+
+								   "<font color='#000' style='font-weight:bold;'>" + this.y+ "</font>" + '</span>');
+							return s.join(' <br> ');
+						},
+						useHTML: true	
+					};
+				}
+				
+				chart.update({
+					chart: {
+						type: globalConfig.charttype
+					},
+					title: {
+						text: globalConfig.charttype
+					},
+					xAxis: {
+						categories:categories
+					},
+					tooltip:tooltip,
+					series: series
+				}, true);
+				
+				chart.hideLoading();
+			}
+		}
+		
+		
+		
+		//刷新左侧指标
+		function freshMetrics(){
+			var metrics = getAllMetrics();
+			var html = metrics.map(function(element, index, array){					
+				return "<li data-index='" + element.index+ "' class='row-flex-space-between'><span class='title'>" + element.metrics + "</span>" + 
+					"<span class='quick row-flex-space-between'><span class='quick_x'>+x</span><span class='quick_y'>+y</span></span></li>";
+			}).join("");
+			$(".left-container").find("ul").html(html);
+		}
+		
+		function newAxisItem(title){
+			return $("<div class='column-flex-center axis-item'><span class='title autocut' title='" + title + "'>" + title + "</span><span class='delete'>x</span></div>");
+		}
+		
+		function cloneAxisItem(dom) {
+			return $("<div data-index='" + dom.data("index") + "'>" + dom.find(".title").html() + "</div>");
+		}
+		
+		var chart = Highcharts.chart('chart-container', {
+			credits: {
+				enabled: false
+			},
+			title:{
+				text:"图表标题"
+			},
+			xAxis: {
+				categories: []
+			},
+			series: [{
+				data: []
+			}]
+		});
+		
+		var copy = false,
+			copyDom = null,
+			mousedown_X = mousedown_Y = mousemove_X = mousemove_Y = OrgX = OrgY = 0;
+		
+		$("body").on("mousemove mouseup", function(e){
+			if(e.type === "mousemove") {
+				if(copy && copyDom) {
+					mousemove_X = e.clientX;
+                    mousemove_Y = e.clientY;
+                    var left = mousemove_X-mousedown_X+OrgX;
+                    var top = mousemove_Y-mousedown_Y+OrgY;
+                    copyDom.offset({left:left,top:top});
+                    return false;
+				} else {
+					return;
+				}
+			} else {
+				copy = false;
+				if(copyDom) {
+					var validY = true;
+					if($(".axis-container-focus").length === 1) {
+						var axisType = $(".axis-container-focus").data("type");
+						var index = copyDom.data("index");
+						var title = copyDom.html();
+						if(axisType === "xaxis") {
+							$(".axis-container-focus").html("");
+							globalConfig.xAxis = index;
+						} else {
+							var yAxisIndex = globalConfig.yAxis ? globalConfig.yAxis.length : 0;
+							if(!globalConfig.yAxis) {
+								globalConfig.yAxis = [];
+							} else {
+								validY = globalConfig.yAxis.length < yAxis_limit && globalConfig.yAxis.filter(function(ele, index1, array){
+									return ele.index == index;
+								}).length <= 0;
+								
+							}
+							if(validY) {
+								globalConfig.yAxis[yAxisIndex] = {index:index,title:title};
+								if(globalConfig.seriesCount < globalConfig.yAxis.length) {
+									chart.addSeries({data: []});
+								}
+							}
+						}
+						if(validY) {
+							$(".axis-container-focus").append(newAxisItem(title));
+							refreshChart();
+						} 
+					}
+					copyDom.remove();
+				}
+				copyDom = null;
+				$(".axis-container-focus").removeClass("axis-container-focus");
+			}
+		});
+		
+		$("body").on("mouseenter mouseleave", ".axis-container", function(e){
+			if(e.type === "mouseenter") {
+				if(copy && copyDom) {
+					$(this).addClass("axis-container-focus");
+				}
+			} else {
+				$(this).removeClass("axis-container-focus");
+			}
+		});
+		
+		$(".left-container").on("mousedown", "li", function(e){
+			var cloneMetrics = cloneAxisItem($(this));
+			var offset = $(this).offset();
+			cloneMetrics.css({
+				position:"absolute",
+				width:150,
+				height:25,
+				top: offset.top,
+				left: offset.left,
+				opacity:0.2,
+				backgroundColor:"#06C",
+				color:"#fff",
+				lineHeight: "25px",
+				textIndent: "12px"
+			});
+			
+			$("body").append(cloneMetrics);
+			copyDom = cloneMetrics;
+			copy = true;
+			mousedown_X = e.clientX;
+			mousedown_Y = e.clientY;
+			OrgX = $(this).offset().left;
+			OrgY = $(this).offset().top;
+		});
+		
+		$(".left-container").on("mouseenter mouseleave", "li", function(e){
+			var quickContainer = $(this).find(".quick");
+			if(e.type === "mouseenter") {
+				quickContainer.fadeIn();
+			} else {
+				quickContainer.hide();
+			}
+		});
+		
+		$(".left-container").on("mousedown", ".quick_x,.quick_y", function(e){
+			var index = $(this).parent(".quick").parent("li").data("index");
+			var title = $(this).parent(".quick").parent("li").find(".title").html();
+			var validY = true;
+			var container;
+			if($(this).hasClass("quick_x")) {
+				globalConfig.xAxis = index;
+				container = $(".config-container").find(".axis-container").eq(0);
+				container.html("");
+			} else {
+				container = $(".config-container").find(".axis-container").eq(1);
+				var yAxisIndex = globalConfig.yAxis ? globalConfig.yAxis.length : 0;
+				if(!globalConfig.yAxis) {
+					globalConfig.yAxis = [];
+				} else {
+					validY = globalConfig.yAxis.length < yAxis_limit && globalConfig.yAxis.filter(function(ele, index1, array){
+						return ele.index == index;
+					}).length <= 0;
+					
+				}
+				if(validY) {
+					globalConfig.yAxis[yAxisIndex] = {index:index,title:title};
+					if(globalConfig.seriesCount < globalConfig.yAxis.length) {
+						chart.addSeries({data: []});
+					}
+				}
+			}
+			if(validY) {
+				container.append(newAxisItem(title));
+				refreshChart();
+			} 
+			e.stopPropagation();
+		});
+		
+		//选择图表类型
+		$(".config-container").on("click", ".chart-icon", function(){
+			if(!$(this).parent(".chart-icon-item").hasClass("selected")) {
+				$(".chart-icon-container").find(".selected").removeClass("selected");
+				$(this).parent(".chart-icon-item").addClass("selected");
+				var charttype = $(this).data("type");
+				globalConfig.charttype = charttype;
+				
+				var isPie = globalConfig.charttype === "pie";
+				if(isPie) {
+					for(let i=globalConfig.yAxis.length - 1;i>0;i--) {
+						chart.series[i].remove();
+						$("#yaxis-container").find(".axis-item").eq(i).remove();
+						globalConfig.seriesCount--;
+					}
+					globalConfig.yAxis.splice(1,globalConfig.yAxis.length - 1);
+				}
+				
+				refreshChart();
+			}
+		});
+		
+		//删除 横坐标或纵坐标
+		$(".config-container").on("click", ".axis-item .delete", function(){
+			var type = $(this).parents(".axis-container").data("type");
+			var axis_item = $(this).parents(".axis-item");
+			if(type === "xaxis") {
+				globalConfig.xAxis = null;
+			} else {
+				var index = axis_item.index();
+				globalConfig.yAxis.splice(index, 1);
+				chart.series[index].remove();
+				globalConfig.seriesCount --;
+			}
+			axis_item.remove();
+			refreshChart();
+		});
+		
+		$(".pre").on("click", function(){
+			window.location.href = "demo.html";
+		});
+			
+		freshMetrics();
+		refreshChart();
+	</script>
+
+</html>

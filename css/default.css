@@ -1,0 +1,287 @@
+.red {
+			color:red;
+		}
+		
+		.ml-12 {
+			margin-left:12px;
+		}
+		
+		.autocut {
+			overflow: hidden;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+			-o-text-overflow: ellipsis;
+			-icab-text-overflow: ellipsis;
+		}
+		
+		ul {
+			padding:0;
+			margin:0;
+		}
+		
+		li {
+			display:block;
+		}
+		
+		.container {
+			height:400px;
+			width:1000px;
+			margin:50px auto 150px auto;
+			font-size:12px;
+		}
+		
+		.pre,
+		.next {
+			width:100px;
+			font-size:30px;
+			text-align:center;
+			font-weight:bold;
+			cursor:pointer;
+		}
+		
+		.disable {
+			cursor:default;
+			color:#999;
+		}
+		
+		.main-container {
+			width:100%;
+			height:100%;
+			border:1px solid #ccc;
+		}
+		
+		.row-flex {
+			display:flex;
+			display: -webkit-box;  /* 老版本语法: Safari, iOS, Android browser, older WebKit browsers. */
+			display: -moz-box;     /* 老版本语法: Firefox (buggy) */
+			display: -ms-flexbox;  /* 混合版本语法: IE 10 */
+			display: -webkit-flex; /* 新版本语法: Chrome 21+ */
+			flex-flow:row nowrap;
+		}
+		
+		.column-flex {
+			display:flex;
+			display: -webkit-box;  /* 老版本语法: Safari, iOS, Android browser, older WebKit browsers. */
+			display: -moz-box;     /* 老版本语法: Firefox (buggy) */
+			display: -ms-flexbox;  /* 混合版本语法: IE 10 */
+			display: -webkit-flex; /* 新版本语法: Chrome 21+ */
+			flex-flow:column nowrap;
+		}
+		
+		.column-flex-center {
+			display:flex;
+			display: -webkit-box;  /* 老版本语法: Safari, iOS, Android browser, older WebKit browsers. */
+			display: -moz-box;     /* 老版本语法: Firefox (buggy) */
+			display: -ms-flexbox;  /* 混合版本语法: IE 10 */
+			display: -webkit-flex; /* 新版本语法: Chrome 21+ */
+			flex-flow:column nowrap;
+			justify-content:center;
+		}
+		
+		.row-flex-space-between {
+			display:flex;
+			display: -webkit-box;  /* 老版本语法: Safari, iOS, Android browser, older WebKit browsers. */
+			display: -moz-box;     /* 老版本语法: Firefox (buggy) */
+			display: -ms-flexbox;  /* 混合版本语法: IE 10 */
+			display: -webkit-flex; /* 新版本语法: Chrome 21+ */
+			flex-flow:row nowrap;
+			justify-content:space-between;
+		}
+		
+		.left-container {
+			flex:1;
+			-webkit-box-flex: 1;   /* OLD - iOS 6-, Safari 3.1-6 */  
+			-moz-box-flex: 1;     /* OLD - Firefox 19- */              
+			-webkit-flex: 1;      /* Chrome */  
+			-ms-flex: 1;           /* IE 10 */
+			height:100%;
+			border-right: 1px solid #dcdcdc;
+		}
+		
+		.left-container .nav-scroll {
+			height:100%;
+			overflow-y:auto;
+		}
+		
+		.left-container .nav-scroll>li {
+			line-height:25px;
+			text-indent:12px;
+		}
+		
+		.left-container .nav-scroll .title,
+		.left-container .nav-scroll .quick {
+			cursor:pointer;
+		}
+		
+		.left-container .nav-scroll>li:hover {
+			background-color:#06C;
+			color:white;
+		}
+		
+		.left-container .nav-scroll .quick {
+			margin-right:12px;	
+			width:40px;
+			text-indent:0;
+			display:none;
+		}
+		
+		.left-container .nav-scroll .quick>span {
+			padding: 0 2px;
+		}
+		
+		.left-container .nav-scroll .quick>span:hover {
+			color:red;
+		}
+		
+		.left-container .nav-scroll::-webkit-scrollbar {
+			width: 6px
+		}
+
+		.left-container .nav-scroll::-webkit-scrollbar-thumb {
+			background-color: transparent;
+			background-clip: content-box;
+			border-top: 3px solid rgba(255, 255, 255, 0);
+			border-bottom: 3px solid rgba(255, 255, 255, 0);
+			border-right: 2px solid rgba(255, 255, 255, 0)
+		}
+
+		.left-container .nav-scroll:hover::-webkit-scrollbar-thumb {
+			background-color: #e1e3e4;
+		}
+
+		.left-container .nav-scroll::-webkit-scrollbar-track {
+			background-color: #f9f8f8;
+		}
+				
+		.right-container {
+			flex:4;
+			-webkit-box-flex: 4;   /* OLD - iOS 6-, Safari 3.1-6 */  
+			-moz-box-flex: 4;     /* OLD - Firefox 19- */              
+			-webkit-flex: 4;      /* Chrome */  
+			-ms-flex: 4;           /* IE 10 */
+			height:100%;
+		}
+		
+		.top-container {
+			flex:1;
+			-webkit-box-flex: 1;   /* OLD - iOS 6-, Safari 3.1-6 */  
+			-moz-box-flex: 1;     /* OLD - Firefox 19- */              
+			-webkit-flex: 1;      /* Chrome */  
+			-ms-flex: 1;           /* IE 10 */
+			width:100%;
+			border-bottom:1px solid #dcdcdc;
+		}
+		
+		.config-container ul>li {
+			line-height:35px;
+			text-indent:12px;
+		}
+		
+		.config-container .title {
+			width:70px;
+		}
+		
+		.config-container .chart-icon {
+			width:25px;
+			height:25px;
+			display:inline;
+			cursor:pointer;
+			border:1px solid white;
+			border-radius:6px;
+		}
+		
+		.config-container .chart-icon:hover {
+			border:1px solid #06C;
+		}
+		
+		.config-container .pie{
+			background: url("../images/pie.png") center no-repeat;
+		}
+		
+		.config-container .selected .pie{
+			background: url("../images/pie_selected.png") center no-repeat;
+		}
+		
+		.config-container .line {
+			background: url('../images/line.png') center no-repeat;
+		}
+		
+		.config-container .selected .line {
+			background: url('../images/line_selected.png') center no-repeat;
+		}
+		
+		.config-container .column {
+			background: url('../images/column.png') center no-repeat;
+		}
+		
+		.config-container .selected .column {
+			background: url('../images/column_selected.png') center no-repeat;
+		}
+		
+		.axis-container {
+			width:80%;
+			height:30px;
+			background-color: #F2F2F2;
+			z-index:1000;
+		}
+		
+		.axis-container-focus {
+			background-color: #e4e4e4;
+		}
+		
+		.axis-container .axis-item,
+		.axis-container-focus .axis-item {
+			background:#3285d9;
+			color:white;
+			width:120px;
+			overflow: hidden;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+		}
+		
+		.axis-container .axis-item:not(:first-child),
+		.axis-container-focus .axis-item:not(:first-child) {
+			margin-left:12px;
+		}
+		
+		.axis-item {
+			line-height:30px;
+			background:#06C;
+			position: relative;
+		}
+		
+		.axis-item .title {
+			width:90px;
+		}
+		
+		.axis-item .delete {
+			position: absolute;
+			left: 90px;
+			top: 3px;
+			width: 20px;
+			height: 20px;
+			line-height: 20px;
+			cursor: pointer;
+		}
+		
+		.bottom-container {
+			flex:4;
+			-webkit-box-flex: 4;   /* OLD - iOS 6-, Safari 3.1-6 */  
+			-moz-box-flex: 4;     /* OLD - Firefox 19- */              
+			-webkit-flex: 4;      /* Chrome */  
+			-ms-flex: 4;           /* IE 10 */
+			width:100%;
+		}
+		
+		.bottom-container div {
+			max-height:290px;
+			height:100%;
+			width:100%;
+		}
+		#msg-container {
+			text-align:center
+		}
+		
+		#chart-container {
+			overflow:hidden;
+		}

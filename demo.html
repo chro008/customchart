@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>自定义highcharts</title>
+		<link rel="stylesheet" type="text/css" href="css/default.css">
+	</head>
+	
+	<body>
+		<a href="../../index.html">返回项目列表页</a>
+		<h1 style="text-align:center">自定义highchart图</h1>
+		<div class="row-flex container">
+		<div class="pre column-flex-center disable"><</div>
+		<div class="main-container">
+			<div id="config-container" style="height:50px;line-height:50px;">
+				<span class="ml-12">图表类型</span>
+				<select id="charttype">
+					<option value="0">请选择</option>
+					<option value="line">线图</option>
+					<option value="column">柱状图</option>
+					<option value="pie">饼图</option>
+				</select>
+				<span class="red">*</span>
+				
+				<span class="ml-12">横轴</span>
+				<select id="xAxis">
+					<option value="0">请选择</option>
+					
+				</select>
+				<span class="red">*</span>
+				
+				<div style="display:inline-block" id="yAxis-container">
+					<div style="display:inline-block" class="item fiexed">
+						<span class="ml-12" data-index="0">纵轴数据列</span>
+							<select class="yAxis">
+								<option value="0">请选择</option>
+								
+							</select>
+						
+						<span class="red">*</span>
+					</div>
+				</div>
+				
+				
+				<button id="addButton">增加一个数据列</button>
+			</div>
+			
+			
+			<div id="chart-container" style="width:100%;border-top:1px solid #ccc;height:340px;"></div>
+			<div id="msg-container" class="red" style="width:100%;border-top:1px solid #ccc;height:350px;display:none;line-height:350px;text-align:center"></div>
+		</div>
+		
+		<div class="next column-flex-center">></div>
+		</div>
+	
+	</body>
+	
+	<script src="https://cdn.hcharts.cn/highcharts/highcharts.js"></script>
+	<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+	
+	<script>
+		
+		var globalData = {"titles":["省","市","男生","女生","成年","老人","未成年","工人","学生","白领","蓝领","流浪的人","游戏主播","明星主播","无法分类的人","教师","医护人员","吃皇粮的","吃狗粮的"],"results":[],"type":["x","x","y","y","y","y","y","y","y","y","y","y","y","y","y","y","y","y","y"]};
+		
+		var regionData = [{"code":110000,"province":"北京市","city":"东城区"},{"code":120000,"province":"天津市","city":"天津市"},{"code":130000,"province":"河北省","city":"石家庄市"},{"code":140000,"province":"山西省","city":"太原市"},{"code":150000,"province":"内蒙古自治区","city":"呼和浩特市"},{"code":210000,"province":"辽宁省","city":"沈阳市"},{"code":220000,"province":"吉林省","city":"长春市"},{"code":230000,"province":"黑龙江省","city":"哈尔滨市"},{"code":310000,"province":"上海市","city":"黄浦区"},{"code":320000,"province":"江苏省","city":"南京市"},{"code":330000,"province":"浙江省","city":"杭州市"},{"code":340000,"province":"安徽省","city":"合肥市"},{"code":350000,"province":"福建省","city":"福州市"},{"code":360000,"province":"江西省","city":"南昌市"},{"code":370000,"province":"山东省","city":"济南市"},{"code":410000,"province":"河南省","city":"郑州市"},{"code":420000,"province":"湖北省","city":"武汉市"},{"code":430000,"province":"湖南省","city":"长沙市"},{"code":440000,"province":"广东省","city":"广州市"},{"code":450000,"province":"广西壮族自治区","city":"南宁市"},{"code":460000,"province":"海南省","city":"海口市"},{"code":500000,"province":"重庆市","city":"重庆市"},{"code":510000,"province":"四川省","city":"成都市"},{"code":520000,"province":"贵州省","city":"贵阳市"},{"code":530000,"province":"云南省","city":"昆明市"},{"code":540000,"province":"西藏自治区","city":"拉萨市"},{"code":610000,"province":"陕西省","city":"西安市"},{"code":620000,"province":"甘肃省","city":"兰州市"},{"code":630000,"province":"青海省","city":"西宁市"},{"code":640000,"province":"宁夏回族自治区","city":"银川市"},{"code":650000,"province":"新疆维吾尔自治区","city":"乌鲁木齐市"},{"code":810000,"province":"香港特别行政区","city":"香港特别行政区"},{"code":820000,"province":"澳门特别行政区","city":"澳门特别行政区"},{"code":910000,"province":"台湾省","city":"台湾省"}];
+		
+		initGlobalData();
+
+		let globalConfig = {
+			charttype:null,
+			xAxis:null,
+			yAxis:[null]
+		};
+	
+		let cols = globalData.titles;
+		let results = globalData.results;
+		
+		
+		let xAxis = document.querySelector("#xAxis"),
+			yAxis = document.querySelector(".yAxis"),
+			chartType = document.querySelector("#charttype");
+			
+		xAxis.innerHTML = xAxis.innerHTML + getSelectColsHtml();
+		yAxis.innerHTML = yAxis.innerHTML + getSelectColsHtml();
+		
+		function initGlobalData(){
+			globalData.results = regionData.map(function(ele, index, array){
+				var data = [].concat(ele.province,ele.city);
+				for(var i=0;i<17;i++) {
+					data.push(getRandomInteger(100));
+				}
+				return data;
+			});
+		}
+		
+		function getRandomInteger(top){
+			return parseInt(Math.random()*top);
+		}
+		
+		function getSelectColsHtml(excepts) {
+			/*let validCols = cols.filter(function(element,index,array){
+				return (excepts||[]).indexOf(element) < 0;
+			});*/
+			
+			return cols.map(function(element,index,array){
+				return "<option value='" + element + "'>" + element + "</option>";
+			}).join("");
+		}
+		
+		
+		function getDatasByColIndex(colIndex) {
+			let datas = [];
+			if(colIndex || colIndex === 0) {
+				datas = results.map(function(element,index,array){
+					return element.filter(function(element1,index1,array1){
+						return index1 == colIndex;
+					})[0];
+				});
+			}
+			return datas;
+		}
+		
+		function showMsg(msg){
+			document.querySelector("#msg-container").style.display = "block";
+			document.querySelector("#chart-container").style.display = "none";
+			document.querySelector("#msg-container").innerHTML = "<span>" + msg + "</span>";
+		}
+		
+		function isPie(){
+			return globalConfig.charttype === "pie";
+		}
+		
+		function refreshChart(){
+			if(!globalConfig.charttype || globalConfig.charttype == 0) {
+				showMsg("请选择图表类型");
+			} else if(!globalConfig.xAxis || globalConfig.xAxis == 0) {
+				showMsg("请选择横轴");
+			} else if(!globalConfig.yAxis[0] || globalConfig.yAxis[0].optionIndex == 0) {
+				showMsg("请选择纵轴数据列");
+			}else {
+				chart.showLoading();
+				
+				document.querySelector("#msg-container").style.display = "none";
+				document.querySelector("#chart-container").style.display = "block";				
+				
+				let xAxisDatas = getDatasByColIndex(globalConfig.xAxis - 1),
+					series = [];
+			
+				for(let i=0;i<globalConfig.yAxis.length;i++) {
+					series[i] = {
+						data:getDatasByColIndex(globalConfig.yAxis[i].optionIndex - 1),
+						name: globalConfig.yAxis[i].val
+					};
+				}	
+
+				let isPie = globalConfig.charttype === "pie";
+				
+				series = series.map(function(obj,i){
+					let mapData = obj.data.map(function(data,index) {
+						let num = isNaN(data) ? 0 : parseFloat(data);
+						return isPie ? [xAxisDatas[index], num] : num;
+					});
+
+					return {
+						data:mapData,
+						name:obj.name
+					};
+				});
+				
+				var tooltip = {};
+				
+				if(globalConfig.charttype === "line" || globalConfig.charttype === "column") {
+					tooltip = {
+						formatter: function() {
+							var s = [];
+							s.push("<font style='font-weight:bold;'>"+this.points[0].key+"</font>");
+							$.each(this.points, function(i, point) {
+								s.push("<span style='color:"+point.point.color+";font-size:12px;'>"+ point.series.name+' : '+
+								   "<font color='#000' style='font-weight:bold;'>" + point.y+ "</font>" + '</span>');
+							});
+							return s.join(' <br> ');
+						},
+						shared: true,
+						useHTML: true	
+					};
+				} else {
+					tooltip = {
+						formatter: function() {
+							var s = [];
+							s.push("<font style='font-weight:bold;'>"+this.key+"</font>");
+							s.push("<span style='color:"+this.color+";font-size:12px;'>"+ this.series.name+' : '+
+								   "<font color='#000' style='font-weight:bold;'>" + this.y+ "</font>" + '</span>');
+							return s.join(' <br> ');
+						},
+						useHTML: true	
+					};
+				}
+				
+				chart.update({
+					chart: {
+						type: globalConfig.charttype
+					},
+					title: {
+						text: globalConfig.charttype
+					},
+					xAxis: {
+						categories:xAxisDatas
+					},
+					tooltip:tooltip,
+					series: series
+				}, true);
+				
+				chart.hideLoading();
+			}
+		}
+		
+		function addYAxis(){
+			let excepts = globalConfig.yAxis.filter(function(ele, index, array){
+				return ele !== null;
+			});
+			let index = globalConfig.yAxis.length;
+			let html = '<div style="display:inline-block" class="item"><span class="ml-12">数据列</span>' + 
+				'<select class="yAxis">' + 
+				'<option value="0">请选择</option>' + 
+				getSelectColsHtml(excepts) + 
+				'</select>' + 
+				'<span class="delete" style="cursor:pointer;margin-left:4px;">x</span></div>';
+				
+			$("#yAxis-container").append($(html));
+		}
+		
+		function freshButton(){
+			let counts = $("#yAxis-container").find(".item").length;
+			if(counts >= 3 || isPie()) {
+				$("#addButton").hide();
+			} else {
+				$("#addButton").fadeIn();
+			}
+		}
+		
+		let chart = Highcharts.chart('chart-container', {
+			credits: {
+				enabled: false
+			},
+			title:{
+				text:"图表标题"
+			},
+			xAxis: {
+				categories: []
+			},
+			series: [{
+				data: []
+			}]
+		});
+		
+		chartType.onchange = function(){
+			globalConfig.charttype = chartType.value;
+			
+			if(isPie()) {
+				for(let i=globalConfig.yAxis.length - 1;i>0;i--) {
+					chart.series[i].remove();
+				}
+				globalConfig.yAxis.splice(1,globalConfig.yAxis.length - 1);
+				$("#yAxis-container").find(".item").not(".fiexed").remove();
+			}
+			freshButton();
+			refreshChart();
+		};
+		
+		xAxis.onchange = function(){
+			globalConfig.xAxis = xAxis.selectedIndex;
+			refreshChart();
+		};
+		
+		$("#yAxis-container").on("change", ".yAxis", function(){
+			let val = $(this).val();
+			let index = $(this).parent(".item").index();
+			let optionIndex = $(this).find("option:selected").index();
+			globalConfig.yAxis[index] = {optionIndex:optionIndex,val:val};
+			refreshChart();
+		});
+		
+		$("#yAxis-container").on("click", ".delete", function(){
+			let index = $(this).parent(".item").index();
+			globalConfig.yAxis.splice(index,1);
+			$(this).parent(".item").remove();
+			chart.series[index].remove();
+			freshButton();
+			refreshChart();
+		});
+		
+		document.querySelector("#addButton").onclick = function(){
+			addYAxis();
+			chart.addSeries({data: []});
+			freshButton();
+		};
+			
+		$(".next").on("click", function(){
+			window.location.href = "demo1.html";
+		});
+		
+		refreshChart();
+	</script>
+
+</html>
