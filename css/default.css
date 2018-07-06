@@ -1,4 +1,4 @@
-.red {
+		.red {
 			color:red;
 		}
 		
@@ -12,6 +12,12 @@
 			text-overflow: ellipsis;
 			-o-text-overflow: ellipsis;
 			-icab-text-overflow: ellipsis;
+		}
+		
+		.box-shadow {
+			box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+			-moz-box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+			-webkit-box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
 		}
 		
 		ul {
@@ -106,6 +112,7 @@
 		.left-container .nav-scroll>li {
 			line-height:25px;
 			text-indent:12px;
+			cursor:pointer;
 		}
 		
 		.left-container .nav-scroll .title,
@@ -113,24 +120,45 @@
 			cursor:pointer;
 		}
 		
-		.left-container .nav-scroll>li:hover {
-			background-color:#06C;
-			color:white;
-		}
-		
 		.left-container .nav-scroll .quick {
 			margin-right:12px;	
-			width:40px;
-			text-indent:0;
+			width:20px;
+			height:20px;
+			padding-top:3px;
+			background: url("../images/choose.png") center no-repeat;
 			display:none;
 		}
 		
-		.left-container .nav-scroll .quick>span {
-			padding: 0 2px;
+		.left-container .nav-scroll .quick:hover {
+			background: url("../images/choose_hover.png") center no-repeat;
 		}
 		
-		.left-container .nav-scroll .quick>span:hover {
-			color:red;
+		.quickDetailContainer {
+			left: 225px;
+			width: 130px;
+			border: 1px solid #CCC;
+			z-index: 1500;
+			background: white;
+			position: absolute;
+			line-height:24px;
+			text-indent:12px;
+			color:#333;
+			display: none;
+			font-size:12px;
+		}
+		
+		.quickDetailContainer .quick_item {
+			cursor:pointer;
+		}
+		
+		.quickDetailContainer .quick_item:hover {
+			background-color:#18b9cd;
+			color:white;
+		}
+		
+		.left-container .nav-scroll>li:hover {
+			background-color:#06C;
+			color:white;
 		}
 		
 		.left-container .nav-scroll::-webkit-scrollbar {

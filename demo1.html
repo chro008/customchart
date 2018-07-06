@@ -49,6 +49,10 @@
 		
 		<div class="next column-flex-center disable">></div>
 		</div>
+		
+		<div id="quickDetailContainer" class="box-shadow quickDetailContainer">
+			
+		</div>
 	</body>
 	
 	<script src="https://cdn.hcharts.cn/highcharts/highcharts.js"></script>
@@ -112,6 +116,10 @@
 			$("#chart-container").hide();
 		}
 		
+		function isPie() {
+			return globalConfig.charttype === "pie";
+		}
+		
 		function refreshChart(){
 			if(!globalConfig.charttype) {
 				freshMsg("请选择图表类型");
@@ -135,12 +143,12 @@
 					};
 				}	
 
-				var isPie = globalConfig.charttype === "pie";
+				var pie = isPie();
 				
 				series = series.map(function(obj,i){
 					var mapData = obj.data.map(function(data,index) {
 						var num = isNaN(data) ? null : parseFloat(data);
-						return isPie ? [categories[index], num] : num;
+						return pie ? [categories[index], num] : num;
 					});
 
 					return {
@@ -151,7 +159,7 @@
 				
 				var tooltip = {};
 				
-				if(globalConfig.charttype === "line" || globalConfig.charttype === "column") {
+				if(!pie) {
 					tooltip = {
 						formatter: function() {
 							var s = [];
@@ -203,7 +211,7 @@
 			var metrics = getAllMetrics();
 			var html = metrics.map(function(element, index, array){					
 				return "<li data-index='" + element.index+ "' class='row-flex-space-between'><span class='title'>" + element.metrics + "</span>" + 
-					"<span class='quick row-flex-space-between'><span class='quick_x'>+x</span><span class='quick_y'>+y</span></span></li>";
+					"<span class='quick'></span></li>";
 			}).join("");
 			$(".left-container").find("ul").html(html);
 		}
@@ -214,6 +222,44 @@
 		
 		function cloneAxisItem(dom) {
 			return $("<div data-index='" + dom.data("index") + "'>" + dom.find(".title").html() + "</div>");
+		}
+		
+		function changeXorY(isX, index, title){
+			var container;
+			var validY = true;
+			if(isX) {
+				globalConfig.xAxis = index;
+				container = $(".config-container").find(".axis-container").eq(0);
+				container.html("");
+			} else {
+				container = $(".config-container").find(".axis-container").eq(1);
+				var yAxisIndex = globalConfig.yAxis ? globalConfig.yAxis.length : 0;
+				if(!globalConfig.yAxis) {
+					globalConfig.yAxis = [];
+				} else {
+					validY = globalConfig.yAxis.length < yAxis_limit && globalConfig.yAxis.filter(function(ele, index1, array){
+						return ele.index == index;
+					}).length <= 0;
+				}
+				if(validY) {
+					if(isPie()) {
+						globalConfig.yAxis[0] = {index:index,title:title};
+					} else {
+						globalConfig.yAxis[yAxisIndex] = {index:index,title:title};
+					}
+					if(globalConfig.seriesCount < globalConfig.yAxis.length) {
+						chart.addSeries({data: []});
+					}
+				}
+			}
+			if(validY) {
+				if(isPie()) {
+					container.html(newAxisItem(title));
+				} else {
+					container.append(newAxisItem(title));
+				}
+				refreshChart();
+			} 
 		}
 		
 		var chart = Highcharts.chart('chart-container', {
@@ -250,35 +296,11 @@
 			} else {
 				copy = false;
 				if(copyDom) {
-					var validY = true;
 					if($(".axis-container-focus").length === 1) {
-						var axisType = $(".axis-container-focus").data("type");
 						var index = copyDom.data("index");
 						var title = copyDom.html();
-						if(axisType === "xaxis") {
-							$(".axis-container-focus").html("");
-							globalConfig.xAxis = index;
-						} else {
-							var yAxisIndex = globalConfig.yAxis ? globalConfig.yAxis.length : 0;
-							if(!globalConfig.yAxis) {
-								globalConfig.yAxis = [];
-							} else {
-								validY = globalConfig.yAxis.length < yAxis_limit && globalConfig.yAxis.filter(function(ele, index1, array){
-									return ele.index == index;
-								}).length <= 0;
-								
-							}
-							if(validY) {
-								globalConfig.yAxis[yAxisIndex] = {index:index,title:title};
-								if(globalConfig.seriesCount < globalConfig.yAxis.length) {
-									chart.addSeries({data: []});
-								}
-							}
-						}
-						if(validY) {
-							$(".axis-container-focus").append(newAxisItem(title));
-							refreshChart();
-						} 
+						var isX = $(".axis-container-focus").data("type") === "xaxis";
+						changeXorY(isX, index, title);
 					}
 					copyDom.remove();
 				}
@@ -322,47 +344,59 @@
 			OrgY = $(this).offset().top;
 		});
 		
+		//显示隐藏 快速增添 x、y的图标
 		$(".left-container").on("mouseenter mouseleave", "li", function(e){
+			$(".left-container").find(".quick").hide();
 			var quickContainer = $(this).find(".quick");
 			if(e.type === "mouseenter") {
-				quickContainer.fadeIn();
-			} else {
-				quickContainer.hide();
-			}
+				quickContainer.show();
+			} 
 		});
 		
-		$(".left-container").on("mousedown", ".quick_x,.quick_y", function(e){
-			var index = $(this).parent(".quick").parent("li").data("index");
-			var title = $(this).parent(".quick").parent("li").find(".title").html();
-			var validY = true;
-			var container;
-			if($(this).hasClass("quick_x")) {
-				globalConfig.xAxis = index;
-				container = $(".config-container").find(".axis-container").eq(0);
-				container.html("");
-			} else {
-				container = $(".config-container").find(".axis-container").eq(1);
-				var yAxisIndex = globalConfig.yAxis ? globalConfig.yAxis.length : 0;
-				if(!globalConfig.yAxis) {
-					globalConfig.yAxis = [];
-				} else {
-					validY = globalConfig.yAxis.length < yAxis_limit && globalConfig.yAxis.filter(function(ele, index1, array){
-						return ele.index == index;
-					}).length <= 0;
-					
-				}
-				if(validY) {
-					globalConfig.yAxis[yAxisIndex] = {index:index,title:title};
-					if(globalConfig.seriesCount < globalConfig.yAxis.length) {
-						chart.addSeries({data: []});
-					}
-				}
-			}
-			if(validY) {
-				container.append(newAxisItem(title));
-				refreshChart();
-			} 
+		//鼠标指向上述图标后 展示详情
+		var quickDetailTimer;
+		var quickDetailContainer = $("#quickDetailContainer");
+		$(".left-container").on("mouseenter mouseleave", ".quick", function(e){
+			if (e.type === "mouseenter") {
+                var offset = $(this).offset();
+				var title = $(this).parent("li").find(".title").html();
+				var index = $(this).parent("li").data("index");
+                quickDetailContainer.html("<div name='quick_info' data-index='" + index + "' data-title='" + title + "'><div style='font-weight:bold'>" + title + "</div><div class='quick_x quick_item'>添加到X轴</div><div class='quick_y quick_item'>添加到Y轴</div></div>");
+                quickDetailContainer.css({"opacity": 0,left: offset.left + 35, top: offset.top}).show();
+                var windowHeight = (document.documentElement.scrollTop || document.body.scrollTop) + $(window).height();
+                var distanceToTop = quickDetailContainer.offset().top + quickDetailContainer.height();
+                if (windowHeight <= distanceToTop) {
+                    quickDetailContainer.css("top", offset.top - 50);
+                }
+                quickDetailContainer.css("opacity", 1);
+                clearTimeout(quickDetailTimer);
+            } else {
+                quickDetailTimer = setTimeout(function () {
+                    quickDetailContainer.hide();
+                }, 400);
+            }
+		});
+		
+		quickDetailContainer.on("mouseenter mouseleave", function (e) {
+            clearTimeout(quickDetailTimer);
+            if (e.type === "mouseenter") {
+                $(this).show();
+            } else {
+                quickDetailTimer = setTimeout(function () {
+                    quickDetailContainer.hide();
+                }, 400);
+            }
+        });
+		
+		//快速增添x、y
+		quickDetailContainer.on("click", ".quick_x,.quick_y", function(e){
+			clearTimeout(quickDetailTimer);
+			var index = $(this).parent("div[name='quick_info']").data("index");
+			var title = $(this).parent("div[name='quick_info']").data("title");
+			var isX = $(this).hasClass("quick_x");
+			changeXorY(isX, index, title);
 			e.stopPropagation();
+			quickDetailContainer.hide();
 		});
 		
 		//选择图表类型
@@ -373,8 +407,7 @@
 				var charttype = $(this).data("type");
 				globalConfig.charttype = charttype;
 				
-				var isPie = globalConfig.charttype === "pie";
-				if(isPie) {
+				if(isPie()) {
 					for(let i=globalConfig.yAxis.length - 1;i>0;i--) {
 						chart.series[i].remove();
 						$("#yaxis-container").find(".axis-item").eq(i).remove();
