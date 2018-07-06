@@ -276,6 +276,7 @@
 			line-height:30px;
 			background:#06C;
 			position: relative;
+			border-radius:6px;
 		}
 		
 		.axis-item .title {
