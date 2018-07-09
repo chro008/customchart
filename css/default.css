@@ -209,7 +209,8 @@
 			width:70px;
 		}
 		
-		.config-container .chart-icon {
+		.config-container .chart-icon,
+		.config-container .sort-icon{
 			width:25px;
 			height:25px;
 			display:inline;
@@ -218,8 +219,14 @@
 			border-radius:6px;
 		}
 		
-		.config-container .chart-icon:hover {
+		.config-container .chart-icon:hover,
+		.config-container .sort-icon:hover  {
 			border:1px solid #06C;
+		}
+		
+		.config-container .selected .sort-icon {
+			border:1px solid #666;
+			cursor:default;
 		}
 		
 		.config-container .pie{
@@ -244,6 +251,18 @@
 		
 		.config-container .selected .column {
 			background: url('../images/column_selected.png') center no-repeat;
+		}
+		
+			.config-container .sort {
+			background: url("../images/sort.png") center no-repeat;
+		}
+		
+		.config-container .sort-desc {
+			background: url("../images/sort_desc.png") center no-repeat;
+		}
+		
+		.config-container .sort-asc {
+			background: url("../images/sort_asc.png") center no-repeat;
 		}
 		
 		.axis-container {

@@ -28,6 +28,13 @@
 									<div class="column-flex-center chart-icon-item"><span class="chart-icon column-flex column" title="柱状图" data-type="column"></span></div>
 									<div class="column-flex-center chart-icon-item"><span class="chart-icon column-flex pie" title="饼状图" data-type="pie"></span></div>
 								</div>
+								
+								<div class="sort-icon-container row-flex">
+									<div class="sort-icon-item">排序</div>
+									<div class="sort-icon-item column-flex-center ml-12 selected"><span class="sort-icon sort" title="默认排序" data-type="default"></span></div>
+									<div class="sort-icon-item column-flex-center"><span class="sort-icon sort-desc" title="降序" data-type="desc"></span></div>
+									<div class="sort-icon-item column-flex-center"><span class="sort-icon sort-asc" title="升序" data-type="asc"></span></div>
+								</div>
 							</li>
 							<li class="row-flex">
 								<span  class="title">X-Axis</span>
@@ -133,70 +140,21 @@
 				$("#msg-container").html("").hide();
 				$("#chart-container").show();	
 				
-				var categories = getDatasByIndex(globalConfig.xAxis),
-					series = [];
-			
-				for(var i=0;i<globalConfig.yAxis.length;i++) {
-					series[i] = {
-						data:getDatasByIndex(globalConfig.yAxis[i].index),
-						name: globalConfig.yAxis[i].title
-					};
-				}	
-
-				var pie = isPie();
+				var data = getFinalChartData();
+				var categories = data.categories;
+				var series = data.series;
 				
-				series = series.map(function(obj,i){
-					var mapData = obj.data.map(function(data,index) {
-						var num = isNaN(data) ? 0 : parseFloat(data);
-						return pie ? [categories[index], num] : num;
-					});
-
-					return {
-						data:mapData,
-						name:obj.name
-					};
-				});
-				
-				var tooltip = {};
-				
-				if(!pie) {
-					tooltip = {
-						formatter: function() {
-							var s = [];
-							s.push("<font style='font-weight:bold;'>"+this.points[0].key+"</font>");
-							$.each(this.points, function(i, point) {
-								s.push("<span style='color:"+point.point.color+";font-size:12px;'>"+ point.series.name+' : '+
-								   "<font color='#000' style='font-weight:bold;'>" + point.y+ "</font>" + '</span>');
-							});
-							return s.join(' <br> ');
-						},
-						shared: true,
-						useHTML: true	
-					};
-				} else {
-					tooltip = {
-						formatter: function() {
-							var s = [];
-							s.push("<font style='font-weight:bold;'>"+this.key+"</font>");
-							s.push("<span style='color:"+this.color+";font-size:12px;'>"+ this.series.name+' : '+
-								   "<font color='#000' style='font-weight:bold;'>" + this.y+ "</font>" + '</span>');
-							return s.join(' <br> ');
-						},
-						useHTML: true	
-					};
-				}
+				var option = getFinalChartOption();
 				
 				chart.update({
-					chart: {
-						type: globalConfig.charttype
-					},
+					chart: option.chartOption,
 					title: {
 						text: globalConfig.charttype
 					},
+					tooltip:option.tooltip,
 					xAxis: {
 						categories:categories
 					},
-					tooltip:tooltip,
 					series: series
 				}, true);
 				
@@ -204,7 +162,131 @@
 			}
 		}
 		
+		function getFinalChartData(){
+			var categories = getDatasByIndex(globalConfig.xAxis),
+				series = [];
 		
+			for(var i=0;i<globalConfig.yAxis.length;i++) {
+				series[i] = {
+					data:getDatasByIndex(globalConfig.yAxis[i].index),
+					name: globalConfig.yAxis[i].title
+				};
+			}	
+			
+			var sorttype = globalConfig.sorttype || "default";
+			if(sorttype === "asc" || sorttype === "desc") {
+				var data = [];
+				for(var i=0,l=categories.length;i<l;i++) {
+					var item = {};
+					item.x = categories[i];
+					item.data = [];
+					for(var j=0;j<series.length;j++) {
+						item.data.push(series[j].data[i]);
+					}
+					data.push(item);
+				}
+				
+				data.sort(function(a,b){
+					if(sorttype === "desc") {
+						return parseFloat(b.data[0]) - parseFloat(a.data[0]);
+					} else {
+						return parseFloat(a.data[0]) - parseFloat(b.data[0]);
+					}				
+				});
+				
+				var newCate = [];
+				var newSeries = [];
+				
+				for(var i=0,l=data.length;i<l;i++) {
+					newCate.push(data[i].x);
+					
+					for(var j=0;j<series.length;j++) {
+						if(i === 0) {
+							newSeries[j] = {};
+							newSeries[j].name = series[j].name;
+							newSeries[j].data = [];
+						}
+						
+						newSeries[j].data.push(data[i].data[j]);						
+					}
+				}
+				
+				categories = newCate;
+				series = newSeries;
+			}
+			
+			var pie = isPie();
+			
+			series = series.map(function(obj,i){
+				var mapData = obj.data.map(function(data,index) {
+					var num = isNaN(data) ? 0 : parseFloat(data);
+					return pie ? [categories[index], num] : num;
+				});
+
+				return {
+					data:mapData,
+					name:obj.name
+				};
+			});
+			
+			return {categories:categories, series:series};			
+		}
+		
+		function getFinalChartOption(){
+			var tooltip = {};
+			var chartOption = {};
+			
+			if(globalConfig.charttype === "line" || globalConfig.charttype === "column") {
+				tooltip = {
+					formatter: function() {
+						var s = [];
+						s.push("<font style='font-weight:bold;'>"+this.points[0].key+"</font>");
+						$.each(this.points, function(i, point) {
+							s.push("<span style='color:"+point.point.color+";font-size:12px;'>"+ point.series.name+' : '+
+							   "<font color='#000' style='font-weight:bold;'>" + point.y+ "</font>" + '</span>');
+						});
+						return s.join(' <br> ');
+					},
+					shared: true,
+					useHTML: true	
+				};
+				
+				chartOption = {
+					type: globalConfig.charttype,
+					resetZoomButton: {
+						theme: {
+							display: 'block'
+						}
+					},
+					zoomType:"xy",
+					panning: true,
+					panKey: 'shift'
+				};
+			} else {
+				tooltip = {
+					formatter: function() {
+						var s = [];
+						s.push("<font style='font-weight:bold;'>"+this.key+"</font>");
+						s.push("<span style='color:"+this.color+";font-size:12px;'>"+ this.series.name+' : '+
+							   "<font color='#000' style='font-weight:bold;'>" + this.y+ "</font>" + '</span>');
+						return s.join(' <br> ');
+					},
+					useHTML: true	
+				};
+				
+				chartOption = {
+					type: globalConfig.charttype,
+					resetZoomButton: {
+						theme: {
+							display: 'none'
+						}
+					}
+				}
+				
+				chart.zoomOut();
+			}
+			return {chartOption:chartOption, tooltip:tooltip}
+		}
 		
 		//刷新左侧指标
 		function freshMetrics(){
@@ -417,6 +499,17 @@
 					globalConfig.yAxis.splice(1,globalConfig.yAxis.length - 1);
 				}
 				
+				refreshChart();
+			}
+		});
+		
+		//选择排序类型
+		$(".config-container").on("click", ".sort-icon", function(){
+			if(!$(this).parent(".sort-icon-item").hasClass("selected")) {
+				$(".sort-icon-container").find(".selected").removeClass("selected");
+				$(this).parent(".sort-icon-item").addClass("selected");
+				var sorttype = $(this).data("type");
+				globalConfig.sorttype = sorttype;
 				refreshChart();
 			}
 		});
