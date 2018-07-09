@@ -3,66 +3,359 @@
 	<head>
 		<meta charset="utf-8">
 		<title>自定义highcharts</title>
-		<link rel="stylesheet" type="text/css" href="css/default.css">
 	</head>
 	
+	<style>
+		* {
+			font-size:12px;
+			font-color:#333;
+		}
+		
+		.red {
+			color:red;
+		}
+		
+		.ml-12 {
+			margin-left:12px;
+		}
+		
+		.autocut {
+			overflow: hidden;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+			-o-text-overflow: ellipsis;
+			-icab-text-overflow: ellipsis;
+		}
+		
+		.box-shadow {
+			box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+			-moz-box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+			-webkit-box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+		}
+
+		ul {
+			padding:0;
+			margin:0;
+		}
+		
+		li {
+			display:block;
+		}
+		
+		.main-container {
+			height:400px;
+			width:800px;
+			border:1px solid #ccc;
+			margin:100px auto;
+		}
+		
+		.left-container {
+			height:100%;
+			width:20%;
+			float:left;
+			border-right: 1px solid #dcdcdc;
+		}
+		
+		.left-container .nav-scroll {
+			height:100%;
+			overflow-y:auto;
+		}
+		
+		.left-container .nav-scroll>li {
+			line-height:25px;
+			text-indent:12px;
+			cursor:pointer;
+		}
+		
+		.left-container .nav-scroll .title,
+		.left-container .nav-scroll .quick {
+			cursor:pointer;
+		}
+		
+		.left-container .nav-scroll .quick {
+			margin-right:12px;	
+			width:20px;
+			height:20px;
+			padding-top:3px;
+			background: url("images/choose.png") center no-repeat;
+			float: right;
+			display:none;
+		}
+		
+		.left-container .nav-scroll .quick:hover {
+			background: url("images/choose_hover.png") center no-repeat;
+		}
+		
+		.quickDetailContainer {
+			left: 225px;
+			width: 130px;
+			border: 1px solid #CCC;
+			z-index: 1500;
+			background: white;
+			position: absolute;
+			line-height:24px;
+			text-indent:12px;
+			color:#333;
+			display: none;
+		}
+		
+		.quickDetailContainer .quick_item {
+			cursor:pointer;
+		}
+		
+		.quickDetailContainer .quick_item:hover {
+			background-color:#18b9cd;
+			color:white;
+		}
+		
+		.left-container .nav-scroll>li:hover {
+			background-color:#06C;
+			color:white;
+		}
+		
+		.left-container .nav-scroll::-webkit-scrollbar {
+			width: 6px
+		}
+
+		.left-container .nav-scroll::-webkit-scrollbar-thumb {
+			background-color: transparent;
+			background-clip: content-box;
+			border-top: 3px solid rgba(255, 255, 255, 0);
+			border-bottom: 3px solid rgba(255, 255, 255, 0);
+			border-right: 2px solid rgba(255, 255, 255, 0)
+		}
+
+		.left-container .nav-scroll:hover::-webkit-scrollbar-thumb {
+			background-color: #e1e3e4;
+		}
+
+		.left-container .nav-scroll::-webkit-scrollbar-track {
+			background-color: #f9f8f8;
+		}
+				
+		.right-container {
+			height:100%;
+			width:79%;
+			float:left;
+		}
+		
+		.top-container {
+			width:100%;
+			height:25%;
+			border-bottom:1px solid #dcdcdc;
+		}
+		
+		.config-container table {
+			width:100%;
+		}
+		
+		.config-container tr {
+			line-height:28px;
+			height:28px;
+		}
+		
+		.config-container td:first-child {
+			width:70px;
+			text-indent:12px;
+		}		
+		
+		.config-container .chart-icon-item,
+		.config-container .sort-icon-item {
+			float:left;
+			width:25px;
+			height:25px;
+			margin-left:2px;
+		}
+		
+		.config-container .chart-icon,
+		.config-container .sort-icon {
+			width:25px;
+			height:25px;
+			display:block;
+			cursor:pointer;
+			border:1px solid white;
+			border-radius:6px;
+		}
+		
+		.config-container .chart-icon:hover,
+		.config-container .sort-icon:hover {
+			border:1px solid #06C;
+		}
+		
+		.config-container .selected .sort-icon {
+			border:1px solid #666;
+			cursor:default;
+		}
+		
+		.config-container .pie{
+			background: url("images/pie.png") center no-repeat;
+		}
+		
+		.config-container .selected .pie{
+			background: url("images/pie_selected.png") center no-repeat;
+		}
+		
+		.config-container .line {
+			background: url('images/line.png') center no-repeat;
+		}
+		
+		.config-container .selected .line {
+			background: url('images/line_selected.png') center no-repeat;
+		}
+		
+		.config-container .column {
+			background: url('images/column.png') center no-repeat;
+		}
+		
+		.config-container .selected .column {
+			background: url('images/column_selected.png') center no-repeat;
+		}
+		
+		.config-container .sort {
+			background: url("images/sort.png") center no-repeat;
+		}
+		
+		.config-container .sort-desc {
+			background: url("images/sort_desc.png") center no-repeat;
+		}
+		
+		.config-container .sort-asc {
+			background: url("images/sort_asc.png") center no-repeat;
+		}
+		
+		.axis-container {
+			width:99%;
+			height:28px;
+			background-color: #F2F2F2;
+			position:relative;
+			z-index:1000;
+		}
+		
+		.axis-container-focus {
+			background-color: #e4e4e4;
+			opacity:0.5;
+		}
+		
+		.axis-container .axis-item,
+		.axis-container-focus .axis-item {
+			background:#3285d9;
+			color:white;
+			width:120px;
+			overflow: hidden;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+		}
+		
+		.axis-container .axis-item:not(:first-child),
+		.axis-container-focus .axis-item:not(:first-child) {
+			margin-left:12px;
+		}
+		
+		.axis-item {
+			line-height:22px;
+			background:#06C;
+			position: relative;
+			border-radius:4px;
+			margin-top:2px;
+			text-indent:6px;
+			float:left;
+		}
+		
+		.axis-item .title {
+			width:90px;
+		}
+		
+		.axis-item .delete {
+			position: absolute;
+			left: 100px;
+			top: 3px;
+			width: 16px;
+			height: 16px;
+			line-height: 16px;
+			cursor: pointer;
+		}
+		
+		.bottom-container {
+			width:100%;
+			height:74%;
+		}
+		
+		.bottom-container div {
+			height:100%;
+			width:100%;
+			max-height:290px;
+		}
+		#msg-container {
+			text-align:center
+		}
+		
+		#chart-container {
+			overflow:hidden;
+		}
+		
+	</style>
+	
 	<body>
-		<a href="../../index.html">返回项目列表页</a>
-		<h1 style="text-align:center">自定义highchart图</h1>
-		<div class="row-flex container">
-		<div class="pre column-flex-center"><</div>
-		<div class="row-flex main-container" name="example1">
+	
+		<div class="main-container">
 			<div class="left-container">
 				<ul class="nav-scroll">
 					
 				</ul>
 			</div>
-			<div class="right-container column-flex">
+			<div class="right-container">
 				<div class="top-container">
 					<div class="config-container">
-						<ul>
-							<li class="row-flex">
-								<span class="title">图表类型</span>
-								<div class="row-flex chart-icon-container"> 
-									<div class="column-flex-center chart-icon-item"><span class="chart-icon column-flex line" title="折线图" data-type="line"></span></div>
-									<div class="column-flex-center chart-icon-item"><span class="chart-icon column-flex column" title="柱状图" data-type="column"></span></div>
-									<div class="column-flex-center chart-icon-item"><span class="chart-icon column-flex pie" title="饼状图" data-type="pie"></span></div>
-								</div>
-								
-								<div class="sort-icon-container row-flex">
-									<div class="sort-icon-item">排序</div>
-									<div class="sort-icon-item column-flex-center ml-12 selected"><span class="sort-icon sort" title="默认排序" data-type="default"></span></div>
-									<div class="sort-icon-item column-flex-center"><span class="sort-icon sort-desc" title="降序" data-type="desc"></span></div>
-									<div class="sort-icon-item column-flex-center"><span class="sort-icon sort-asc" title="升序" data-type="asc"></span></div>
-								</div>
-							</li>
-							<li class="row-flex">
-								<span  class="title">X-Axis</span>
-								<div class="axis-container row-flex" data-type="xaxis"></div>
-							</li>
-							<li class="row-flex">
-								<span class="title">Y-Axis</span>
-								<div class="axis-container row-flex" data-type="yaxis" id="yaxis-container"></div>
-							</li>
-						</ul>
+						<table>
+							<tr>
+								<td>图表类型</td>
+								<td style="width:90px;">
+									<div class="chart-icon-container"> 
+										<div class="chart-icon-item"><span class="chart-icon line" title="折线图" data-type="line"></span></div>
+										<div class="chart-icon-item"><span class="chart-icon column" title="柱状图" data-type="column"></span></div>
+										<div class="chart-icon-item"><span class="chart-icon pie" title="饼状图" data-type="pie"></span></div>
+									</div>
+								</td>
+								<td>
+									<div class="sort-icon-container">
+										<div class="sort-icon-item">排序</div>
+										<div class="sort-icon-item ml-12 selected"><span class="sort-icon sort" title="默认排序" data-type="default"></span></div>
+										<div class="sort-icon-item"><span class="sort-icon sort-desc" title="降序" data-type="desc"></span></div>
+										<div class="sort-icon-item"><span class="sort-icon sort-asc" title="升序" data-type="asc"></span></div>
+									</div>
+								</td>
+							</tr>
+							
+							<tr>
+								<td>X轴</td>
+								<td colspan="2">
+									<div class="axis-container" data-type="xaxis"></div>
+								</td>
+							</tr>
+							
+							<tr>
+								<td>Y轴</td>
+								<td colspan="2">
+									<div class="axis-container" data-type="yaxis" id="yaxis-container"></div>
+								</td>
+							</tr>
+						</table>
 					</div>
 				</div>
 				<div class="bottom-container">
-					<div id="msg-container" class="column-flex-center"></div>
+					<div id="msg-container"></div>
 					<div id="chart-container"></div>
 				</div>
 			</div>
 		</div>
 		
-		<div class="next column-flex-center disable">></div>
-		</div>
-		
 		<div id="quickDetailContainer" class="box-shadow quickDetailContainer">
 			
 		</div>
+	
 	</body>
 	
-	<script src="https://cdn.hcharts.cn/highcharts/highcharts.js"></script>
+	<script src="http://cdn.hcharts.cn/highcharts/highcharts.js"></script>
 	<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
 	
 	<script>
@@ -139,7 +432,7 @@
 				chart.showLoading();
 				
 				$("#msg-container").html("").hide();
-				$("#chart-container").show();	
+				$("#chart-container").show();
 				
 				var data = getFinalChartData();
 				var categories = data.categories;
@@ -293,20 +586,40 @@
 		function freshMetrics(){
 			var metrics = getAllMetrics();
 			var html = metrics.map(function(element, index, array){					
-				return "<li data-index='" + element.index+ "' class='row-flex-space-between'><span class='title'>" + element.metrics + "</span>" + 
+				return "<li data-index='" + element.index+ "'><span class='title'>" + element.metrics + "</span>" + 
 					"<span class='quick'></span></li>";
 			}).join("");
 			$(".left-container").find("ul").html(html);
 		}
 		
 		function newAxisItem(title){
-			return $("<div class='column-flex-center axis-item'><span class='title autocut' title='" + title + "'>" + title + "</span><span class='delete'>x</span></div>");
+			return $("<div class='axis-item'><span class='title autocut' title='" + title + "'>" + title + "</span><span class='delete'>x</span></div>");
 		}
 		
 		function cloneAxisItem(dom) {
 			return $("<div data-index='" + dom.data("index") + "'>" + dom.find(".title").html() + "</div>");
 		}
 		
+		
+		var chart = Highcharts.chart('chart-container', {
+			credits: {
+				enabled: false
+			},
+			title:{
+				text:"图表标题"
+			},
+			xAxis: {
+				categories: []
+			},
+			series: [{
+				data: []
+			}]
+		});
+		
+		var copy = false,
+			copyDom = null,
+			mousedown_X = mousedown_Y = mousemove_X = mousemove_Y = OrgX = OrgY = 0;
+			
 		function changeXorY(isX, index, title){
 			var container;
 			var validY = true;
@@ -345,25 +658,6 @@
 				refreshChart();
 			} 
 		}
-		
-		var chart = Highcharts.chart('chart-container', {
-			credits: {
-				enabled: false
-			},
-			title:{
-				text:"图表标题"
-			},
-			xAxis: {
-				categories: []
-			},
-			series: [{
-				data: []
-			}]
-		});
-		
-		var copy = false,
-			copyDom = null,
-			mousedown_X = mousedown_Y = mousemove_X = mousemove_Y = OrgX = OrgY = 0;
 		
 		$("body").on("mousemove mouseup", function(e){
 			if(e.type === "mousemove") {
@@ -492,7 +786,7 @@
 				globalConfig.charttype = charttype;
 				
 				if(isPie() && globalConfig.yAxis) {
-					for(let i=globalConfig.yAxis.length - 1;i>0;i--) {
+					for(var i=globalConfig.yAxis.length - 1;i>0;i--) {
 						chart.series[i].remove();
 						$("#yaxis-container").find(".axis-item").eq(i).remove();
 						globalConfig.seriesCount--;
@@ -529,10 +823,6 @@
 			}
 			axis_item.remove();
 			refreshChart();
-		});
-		
-		$(".pre").on("click", function(){
-			window.location.href = "demo.html";
 		});
 			
 		freshMetrics();
